@@ -1,0 +1,24 @@
+{
+	"en": {
+		"SKILL_NAME": "Correct your Speech",
+		"GET_PROMPT_MESSAGE": "Please respond to the following question or prompt, start your answer with the word 'answer'. {}",
+		"HELP_MESSAGE": "When responding to a question please begin your answer with the word 'answer'. To exit please say 'exit' or 'cancel'",
+		"HELP_REPROMPT": "What can I help you with?",
+		"FALLBACK_MESSAGE": "The Write and Improve skill can't help you with that, please choose from one of the following categories: meeting someone, The restaurant",
+		"FALLBACK_REPROMPT": "Please choose a category",
+		"ERROR_MESSAGE": "Sorry, an error occurred.",
+		"STOP_MESSAGE": "Goodbye!",
+		"PROMPTS": [
+			"Where are you from?",
+			"Do you work or are you a student?",
+			"What do you enjoy doing at the weekend?",
+			"Do you get many opportunities to speak English?",
+			"What's the best thing that happened to you last week?", 
+			"Where would you like to live in the future"
+		],
+		"RESTAURANT_PROMPTS": [
+		    "What would you like to eat?",
+		    "Have you ever been here before?"
+		    ]
+	}
+}

@@ -1,0 +1,81 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "write and improve english test",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "PromptQuestion",
+          "slots": [],
+          "samples": [
+            "another prompt please",
+            "give me a question prompt"
+          ]
+        },
+        {
+          "name": "GetAnswerIntent",
+          "slots": [
+            {
+              "name": "content",
+              "type": "AMAZON.Actor"
+            }
+          ],
+          "samples": [
+            "Answer {content}"
+          ]
+        },
+        {
+          "name": "RestaurantIntent",
+          "slots": [],
+          "samples": [
+            "the restaurant",
+            "Restaurant "
+          ]
+        },
+        {
+          "name": "BankIntent",
+          "slots": [],
+          "samples": [
+            "the bank",
+            "bank"
+          ]
+        },
+        {
+          "name": "MeetingIntent",
+          "slots": [],
+          "samples": [
+            "meeting someone",
+            "meeting",
+            "Meeting with a friend"
+          ]
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        }
+      ],
+      "types": [],
+      "modelConfiguration": {
+        "fallbackIntentSensitivity": {
+          "level": "LOW"
+        }
+      }
+    }
+  },
+  "version": "12"
+}
