@@ -4,7 +4,7 @@
 		"GET_PROMPT_MESSAGE": "Please respond to the following question or prompt, start your answer with the word 'answer'. {}",
 		"HELP_MESSAGE": "When responding to a question please begin your answer with the word 'answer'. To exit please say 'exit' or 'cancel'",
 		"HELP_REPROMPT": "What can I help you with?",
-		"FALLBACK_MESSAGE": "The Write and Improve skill can't help you with that, please choose from one of the following categories: meeting someone, The restaurant",
+		"FALLBACK_MESSAGE": "The Write and Improve skill can't help you with that, please choose from one of the following categories: meeting someone, eating out, booking train tickets, the airport",
 		"FALLBACK_REPROMPT": "Please choose a category",
 		"ERROR_MESSAGE": "Sorry, an error occurred.",
 		"STOP_MESSAGE": "Goodbye!",
@@ -17,8 +17,26 @@
 			"Where would you like to live in the future"
 		],
 		"RESTAURANT_PROMPTS": [
-		    "What would you like to eat?",
-		    "Have you ever been here before?"
+		    "What's your favourite kind of food?",
+            "How often do you eat out?",
+            "Do you prefer eating out or cooking at home?",
+            "Are you celebrating something?",
+            "Do you prefer formal or informal dining?",
+            "What do you like to drink with your meal?"
+        ],
+		"TRAIN_PROMPTS": [
+		    "Where are you going today?",
+            "When are you coming back?",
+            "Are you going for work or pleasure?",
+            "When did you last take a train?",
+            "Hogwarts Express or Polar Express?",
+            "Do you travel in first or second class?"
+		    ],
+		"AIRPORT_PROMPTS": [
+		    "Where are you going?",
+		    "Are you travelling for work or for pleasure?",
+		    "How long do you plan on staying in this country",
+		    "Is this your first time in this country?"
 		    ]
 	}
 }

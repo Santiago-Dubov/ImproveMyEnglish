@@ -41,11 +41,11 @@ ddb_resource = boto3.resource('dynamodb', region_name=ddb_region)
 dynamodb_adapter = DynamoDbAdapter(table_name=ddb_table_name, create_table=False, dynamodb_resource=ddb_resource)
 sb = CustomSkillBuilder(persistence_adapter=dynamodb_adapter)
 
-TOKEN="8YjNaWhl9RhPnzZDjRAVrh-fSaqneGIaznCfDl8B8"
-USER="FCNVGAZHALFSOVND"
+TOKEN="foo"
+USER="bar"
 
 class PromptQuestionHandler(AbstractRequestHandler):
-    """Handler for Skill Launch and GetNewFact Intent."""
+    """Handler for Skill Launch and PromptQuestion Intent."""
 
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
@@ -63,13 +63,13 @@ class PromptQuestionHandler(AbstractRequestHandler):
             
         handler_input.attributes_manager.session_attributes = attr
         
-        speech = "Welcome to the write and improve situational english checking skill. Please choose from one of the following categories: Meeting someone, The restaurant, The bank"
+        speech = "Welcome to the write and improve situational english checking skill. Please choose from one of the following categories: Meeting someone, Eating out, Booking train tickets, The airport."
         handler_input.response_builder.speak(speech).ask(speech)
         return handler_input.response_builder.response
 
 class RestaurantIntentHandler(AbstractRequestHandler):
     """Handler for RestaurantIntent."""
-
+    
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return (is_intent_name("RestaurantIntent")(handler_input))
@@ -78,8 +78,8 @@ class RestaurantIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         """Handler for Answer input"""
         logger.info("In RestaurantIntentHandler")
-        attr = handler_input.attributes_manager.persistent_attributes
         data = handler_input.attributes_manager.request_attributes["_"]
+        attr = handler_input.attributes_manager.session_attributes
         
         random_prompt = random.choice(data[prompts.RESTAURANT_PROMPTS])
         attr['prompt'] = random_prompt
@@ -91,6 +91,53 @@ class RestaurantIntentHandler(AbstractRequestHandler):
         handler_input.response_builder.speak(speech).ask(speech)
         return handler_input.response_builder.response
 
+class TrainIntentHandler(AbstractRequestHandler):
+    """Handler for TrainIntent."""
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return (is_intent_name("TrainIntent")(handler_input))
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        """Handler for Answer input"""
+        logger.info("In TrainIntentHandler")
+        attr = handler_input.attributes_manager.session_attributes
+        data = handler_input.attributes_manager.request_attributes["_"]
+        
+        random_prompt = random.choice(data[prompts.TRAIN_PROMPTS])
+        attr['prompt'] = random_prompt
+        attr['prompt_given'] = True
+        handler_input.attributes_manager.session_attributes = attr
+        
+        speech = data[prompts.GET_PROMPT_MESSAGE].format(random_prompt)
+        
+        handler_input.response_builder.speak(speech).ask(speech)
+        return handler_input.response_builder.response
+
+class AirportIntentHandler(AbstractRequestHandler):
+    """Handler for AirportIntent."""
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return (is_intent_name("AirportIntent")(handler_input))
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        """Handler for Answer input"""
+        logger.info("In AirportIntentHandler")
+        attr = handler_input.attributes_manager.session_attributes
+        data = handler_input.attributes_manager.request_attributes["_"]
+        
+        random_prompt = random.choice(data[prompts.AIRPORT_PROMPTS])
+        attr['prompt'] = random_prompt
+        attr['prompt_given'] = True
+        handler_input.attributes_manager.session_attributes = attr
+        
+        speech = data[prompts.GET_PROMPT_MESSAGE].format(random_prompt)
+        
+        handler_input.response_builder.speak(speech).ask(speech)
+        return handler_input.response_builder.response
 
 class MeetingIntentHandler(AbstractRequestHandler):
     """Handler for MeetingIntent."""
@@ -103,7 +150,7 @@ class MeetingIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         """Handler for Answer input"""
         logger.info("In MeetingIntentHandler")
-        attr = handler_input.attributes_manager.persistent_attributes
+        attr = handler_input.attributes_manager.session_attributes
         data = handler_input.attributes_manager.request_attributes["_"]
         
         random_prompt = random.choice(data[prompts.PROMPTS])
@@ -146,13 +193,20 @@ class GetAnswerHandler(AbstractRequestHandler):
                                  }
                          ).json()
         if r['type'] != 'success':
-            sys.exit(-1)
+            speech = 'An error occured please repeat your answer'
+            handler_input.response_builder.speak(speech).ask(speech)
+            return handler_input.response_builder.response
         
         r2 = {'type' : 'results_not_ready',
               'estimated_seconds_to_completion' : 2}
+        t1 = time.time()
         while r2['type'] == 'results_not_ready':
-            sleepInterval = max(int(r2['estimated_seconds_to_completion']),1)
-            time.sleep(sleepInterval)
+            t2 = time.time()
+            if t2-t1 > 7.5:
+                speech = 'Our servers appear to be busy at the moment, please repeat your answer'
+                handler_input.response_builder.speak(speech).ask(speech)
+                return handler_input.response_builder.response 
+                
             r2 = requests.get("https://api-staging.englishlanguageitutoring.com/v2.1.0/account/%s/text/%s/results" % (USER,submissionId),
                               headers = {"Authorization": "Token token=%s" % TOKEN}).json()
 
@@ -178,7 +232,8 @@ class GetAnswerHandler(AbstractRequestHandler):
 
         if len(possible_errors) >= 1:
             speech = speech + '. We believe there may be errors in the words:, ' + ' ,'.join(possible_errors)
-            speech = speech + '. We suggest these alternatives:, ' + ' ,'.join(corrections)
+            if len(corrections) > 0:
+                speech = speech + '. We suggest these alternatives:, ' + ' ,'.join(corrections)
         else:
             speech = speech + '. We did not detect any errors'
         speech = speech + '... Please choose a new category'
@@ -258,7 +313,7 @@ class FallbackIntentHandler(AbstractRequestHandler):
         attr = handler_input.attributes_manager.session_attributes
         
         if attr['prompt_given']:
-            speech = "Your answer may be too long or you may have forgotten to start your answer with the word, 'answer"
+            speech = "Your answer may be too long or you may have forgotten to start your answer with the word, 'answer'"
             reprompt = speech
             
         else:   
@@ -368,6 +423,8 @@ class ResponseLogger(AbstractResponseInterceptor):
 sb = CustomSkillBuilder(persistence_adapter=dynamodb_adapter)
 sb.add_request_handler(PromptQuestionHandler())
 sb.add_request_handler(RestaurantIntentHandler())
+sb.add_request_handler(TrainIntentHandler())
+sb.add_request_handler(AirportIntentHandler())
 sb.add_request_handler(MeetingIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(GetAnswerHandler())

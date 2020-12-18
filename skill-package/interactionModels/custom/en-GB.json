@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "write and improve english test",
+      "invocationName": "practice my english",
       "intents": [
         {
           "name": "AMAZON.CancelIntent",
@@ -32,7 +32,7 @@
           "slots": [
             {
               "name": "content",
-              "type": "AMAZON.Actor"
+              "type": "AMAZON.SearchQuery"
             }
           ],
           "samples": [
@@ -43,6 +43,7 @@
           "name": "RestaurantIntent",
           "slots": [],
           "samples": [
+            "eating out",
             "the restaurant",
             "Restaurant "
           ]
@@ -67,6 +68,24 @@
         {
           "name": "AMAZON.FallbackIntent",
           "samples": []
+        },
+        {
+          "name": "AirportIntent",
+          "slots": [],
+          "samples": [
+            "the airport",
+            "at the airport",
+            "airport"
+          ]
+        },
+        {
+          "name": "TrainIntent",
+          "slots": [],
+          "samples": [
+            "the train",
+            "on the train",
+            "buying train tickets"
+          ]
         }
       ],
       "types": [],
@@ -77,5 +96,5 @@
       }
     }
   },
-  "version": "12"
+  "version": "15"
 }
