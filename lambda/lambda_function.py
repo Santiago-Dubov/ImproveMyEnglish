@@ -41,8 +41,8 @@ ddb_resource = boto3.resource('dynamodb', region_name=ddb_region)
 dynamodb_adapter = DynamoDbAdapter(table_name=ddb_table_name, create_table=False, dynamodb_resource=ddb_resource)
 sb = CustomSkillBuilder(persistence_adapter=dynamodb_adapter)
 
-TOKEN="foo"
-USER="bar"
+TOKEN="Removed Upon Request"
+USER="Removed Upon Request"
 
 class PromptQuestionHandler(AbstractRequestHandler):
     """Handler for Skill Launch and PromptQuestion Intent."""
@@ -177,7 +177,8 @@ class GetAnswerHandler(AbstractRequestHandler):
         user_response = str(handler_input.request_envelope.request.intent.slots["content"].value)
         attr = handler_input.attributes_manager.session_attributes
         #question_text = attr['prompt']
-        # Api calls 
+        
+        # Making a call to the WI API
         submissionId=str(uuid.uuid1())
         authorId = str(uuid.uuid1())
         question_text =''
@@ -200,7 +201,9 @@ class GetAnswerHandler(AbstractRequestHandler):
         r2 = {'type' : 'results_not_ready',
               'estimated_seconds_to_completion' : 2}
         t1 = time.time()
+        
         while r2['type'] == 'results_not_ready':
+            # As Alexa must return a response within 8 seconds, if the API takes too long we ask them to repeat their answer
             t2 = time.time()
             if t2-t1 > 7.5:
                 speech = 'Our servers appear to be busy at the moment, please repeat your answer'
@@ -210,8 +213,6 @@ class GetAnswerHandler(AbstractRequestHandler):
             r2 = requests.get("https://api-staging.englishlanguageitutoring.com/v2.1.0/account/%s/text/%s/results" % (USER,submissionId),
                               headers = {"Authorization": "Token token=%s" % TOKEN}).json()
 
-        #result = 'we believe you may have made an error with the following words: ' + ' '.join([str(x[2]) for x in r2['textual_errors']]) + ' .Your relevance score was, {}'.format(r2['score_dimensions']['prompt_relevance'])
-        
         #Processing of the correction
         logger.info('request: ' + r2['type'])
         speech = 'You answered ' + user_response
@@ -221,12 +222,14 @@ class GetAnswerHandler(AbstractRequestHandler):
         corrections = []
         
         for x in r2['textual_errors']:
+            # Ignoring punctuation and spelling errors
             if ('P' in x[3] or x[3] == 'S'):
                 ignore_errors.append([x[0],x[1]])
             else:
                 corrections.append(x[2])
         
         for token in r2['suspect_tokens']:
+            # Record the error if it's not a punctuation or spelling error
             if token not in ignore_errors:
                 possible_errors.append(user_response[token[0]:token[1]])
 
